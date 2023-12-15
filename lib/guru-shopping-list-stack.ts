@@ -1,13 +1,23 @@
 import * as cdk from "aws-cdk-lib";
-import { HttpApi } from "aws-cdk-lib/aws-apigatewayv2";
+import { HttpApi, HttpMethod } from "aws-cdk-lib/aws-apigatewayv2";
 import { HttpJwtAuthorizer } from "aws-cdk-lib/aws-apigatewayv2-authorizers";
+import { HttpLambdaIntegration } from "aws-cdk-lib/aws-apigatewayv2-integrations";
 import {
   OAuthScope,
   ResourceServerScope,
   UserPool,
 } from "aws-cdk-lib/aws-cognito";
 import { AttributeType, BillingMode, Table } from "aws-cdk-lib/aws-dynamodb";
+import { Effect, PolicyStatement } from "aws-cdk-lib/aws-iam";
+import { Runtime, Tracing } from "aws-cdk-lib/aws-lambda";
+import {
+  NodejsFunction,
+  NodejsFunctionProps,
+  OutputFormat,
+} from "aws-cdk-lib/aws-lambda-nodejs";
+import { RetentionDays } from "aws-cdk-lib/aws-logs";
 import { Construct } from "constructs";
+import * as path from "path";
 
 export class GuruShoppingListStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -79,5 +89,58 @@ export class GuruShoppingListStack extends cdk.Stack {
         jwtAudience: [cliClient.userPoolClientId],
       }
     );
+
+    const sharedLambdaConfig: Partial<NodejsFunctionProps> = {
+      handler: "handler",
+      runtime: Runtime.NODEJS_18_X,
+      logRetention: RetentionDays.TWO_WEEKS,
+      tracing: Tracing.ACTIVE,
+      environment: {
+        TABLE_NAME: ddbTable.tableName,
+      },
+      bundling: {
+        sourceMap: true,
+        target: "node18",
+        format: OutputFormat.ESM,
+        nodeModules: [
+          "@aws-lambda-powertools/logger",
+          "@aws-lambda-powertools/tracer",
+          "@aws-lambda-powertools/metrics",
+          "@middy/core",
+        ],
+      },
+    };
+
+    const createListHandler = new NodejsFunction(
+      this,
+      "CreateShoppingListsHandler",
+      {
+        entry: path.join(
+          __dirname,
+          "..",
+          "functions",
+          "v1",
+          "create-shopping-lists",
+          "index.ts"
+        ),
+        ...sharedLambdaConfig,
+      }
+    );
+    createListHandler.addToRolePolicy(
+      new PolicyStatement({
+        effect: Effect.ALLOW,
+        actions: ["dynamodb:PutItem"],
+        resources: [ddbTable.tableArn],
+      })
+    );
+    httpApi.addRoutes({
+      integration: new HttpLambdaIntegration(
+        "CreateShoppingListIntegration",
+        createListHandler
+      ),
+      path: "/v1/shopping_lists",
+      methods: [HttpMethod.POST],
+      authorizer: jwtAuthorizer,
+    });
   }
 }
