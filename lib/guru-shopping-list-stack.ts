@@ -1,16 +1,65 @@
-import * as cdk from 'aws-cdk-lib';
-import { Construct } from 'constructs';
+import * as cdk from "aws-cdk-lib";
+import {
+  OAuthScope,
+  ResourceServerScope,
+  UserPool,
+} from "aws-cdk-lib/aws-cognito";
+import { Construct } from "constructs";
 // import * as sqs from 'aws-cdk-lib/aws-sqs';
 
 export class GuruShoppingListStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
-    // The code that defines your stack goes here
+    const userPool = new UserPool(this, "UserPool", {
+      selfSignUpEnabled: true,
+      signInAliases: { email: true, phone: true },
+      standardAttributes: {
+        givenName: { mutable: true, required: false },
+        familyName: { mutable: true, required: false },
+        email: { mutable: true, required: false },
+        phoneNumber: { mutable: true, required: false },
+      },
+      signInCaseSensitive: false,
+    });
+    const userPoolUrl = `https://cognito-idp.${this.region}.amazonaws.com/${userPool.userPoolId}`;
 
-    // example resource
-    // const queue = new sqs.Queue(this, 'GuruShoppingListQueue', {
-    //   visibilityTimeout: cdk.Duration.seconds(300)
-    // });
+    const readScope = new ResourceServerScope({
+      scopeName: "shopping_lists.read",
+      scopeDescription: "Read shopping lists",
+    });
+    const writeScope = new ResourceServerScope({
+      scopeName: "shopping_lists.write",
+      scopeDescription: "Write shopping lists",
+    });
+    const deleteScope = new ResourceServerScope({
+      scopeName: "shopping_lists.delete",
+      scopeDescription: "Delete shopping lists",
+    });
+
+    const resourceServer = userPool.addResourceServer("ShoppingListsApi", {
+      identifier: "shopping_lists_api",
+      scopes: [readScope, writeScope, deleteScope],
+    });
+
+    // Access the API via curl or other CLI
+    const cliClient = userPool.addClient("CliClient", {
+      oAuth: {
+        flows: { implicitCodeGrant: true },
+        scopes: [
+          OAuthScope.resourceServer(resourceServer, readScope),
+          OAuthScope.resourceServer(resourceServer, writeScope),
+          OAuthScope.resourceServer(resourceServer, deleteScope),
+        ],
+      },
+    });
+
+    const cognitoDomain = userPool.addDomain("SignInDomain", {
+      cognitoDomain: { domainPrefix: "guru-shopping-list" },
+    });
+    // Just use localhost to copy a JWT after sign-in
+    const signInUrl = cognitoDomain.signInUrl(cliClient, {
+      redirectUri: "http://localhost",
+    });
   }
 }
