@@ -33,7 +33,7 @@ export class PipelineStack extends Stack {
           "main",
           { connectionArn }
         ),
-        commands: ["npm install", "npm run test", "npx cdk synth"],
+        commands: ["npm ci", "npm run test", "npx cdk synth"],
       }),
     });
 
