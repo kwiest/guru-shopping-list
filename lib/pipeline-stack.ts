@@ -1,4 +1,4 @@
-import { Stack, StackProps, Stage, StageProps } from "aws-cdk-lib";
+import { Stack, StackProps } from "aws-cdk-lib";
 import { StringParameter } from "aws-cdk-lib/aws-ssm";
 import {
   CodePipeline,
@@ -6,15 +6,7 @@ import {
   ShellStep,
 } from "aws-cdk-lib/pipelines";
 import { Construct } from "constructs";
-import { GuruShoppingListStack } from "./guru-shopping-list-stack";
-
-class GuruShoppingListStage extends Stage {
-  constructor(scope: Construct, id: string, props?: StageProps) {
-    super(scope, id, props);
-
-    new GuruShoppingListStack(this, "GuruShoppingListStack", props);
-  }
-}
+import { GuruShoppingListStage } from "./guru-shopping-list-stage";
 
 export class PipelineStack extends Stack {
   constructor(scope: Construct, id: string, props?: StackProps) {
