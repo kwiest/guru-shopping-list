@@ -4,6 +4,7 @@ import {
   ResourceServerScope,
   UserPool,
 } from "aws-cdk-lib/aws-cognito";
+import { AttributeType, BillingMode, Table } from "aws-cdk-lib/aws-dynamodb";
 import { Construct } from "constructs";
 // import * as sqs from 'aws-cdk-lib/aws-sqs';
 
@@ -60,6 +61,12 @@ export class GuruShoppingListStack extends cdk.Stack {
     // Just use localhost to copy a JWT after sign-in
     const signInUrl = cognitoDomain.signInUrl(cliClient, {
       redirectUri: "http://localhost",
+    });
+
+    const ddbTable = new Table(this, "ShoppingLists", {
+      billingMode: BillingMode.PAY_PER_REQUEST,
+      partitionKey: { name: "PK", type: AttributeType.STRING },
+      sortKey: { name: "SK", type: AttributeType.STRING },
     });
   }
 }
