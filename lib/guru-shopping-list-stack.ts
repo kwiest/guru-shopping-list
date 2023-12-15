@@ -74,13 +74,13 @@ export class GuruShoppingListStack extends cdk.Stack {
       redirectUri: "http://localhost",
     });
 
-    const ddbTable = new Table(this, "ShoppingLists", {
+    const ddbTable = new Table(this, "ShoppingListsTable", {
       billingMode: BillingMode.PAY_PER_REQUEST,
       partitionKey: { name: "PK", type: AttributeType.STRING },
       sortKey: { name: "SK", type: AttributeType.STRING },
     });
 
-    const httpApi = new HttpApi(this, "ShoppingLists");
+    const httpApi = new HttpApi(this, "ShoppingListsApi");
 
     const jwtAuthorizer = new HttpJwtAuthorizer(
       "ShoppingListsAuthorizer",
