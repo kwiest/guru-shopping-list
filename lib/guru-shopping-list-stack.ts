@@ -8,7 +8,6 @@ import {
 } from "aws-cdk-lib/aws-cognito";
 import { AttributeType, BillingMode, Table } from "aws-cdk-lib/aws-dynamodb";
 import { Construct } from "constructs";
-// import * as sqs from 'aws-cdk-lib/aws-sqs';
 
 export class GuruShoppingListStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
