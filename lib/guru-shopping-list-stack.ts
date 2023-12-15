@@ -1,4 +1,6 @@
 import * as cdk from "aws-cdk-lib";
+import { HttpApi } from "aws-cdk-lib/aws-apigatewayv2";
+import { HttpJwtAuthorizer } from "aws-cdk-lib/aws-apigatewayv2-authorizers";
 import {
   OAuthScope,
   ResourceServerScope,
@@ -68,5 +70,15 @@ export class GuruShoppingListStack extends cdk.Stack {
       partitionKey: { name: "PK", type: AttributeType.STRING },
       sortKey: { name: "SK", type: AttributeType.STRING },
     });
+
+    const httpApi = new HttpApi(this, "ShoppingLists");
+
+    const jwtAuthorizer = new HttpJwtAuthorizer(
+      "ShoppingListsAuthorizer",
+      userPoolUrl,
+      {
+        jwtAudience: [cliClient.userPoolClientId],
+      }
+    );
   }
 }
