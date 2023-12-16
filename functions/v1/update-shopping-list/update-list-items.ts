@@ -1,7 +1,7 @@
-import { DynamoDBClient, PutItemCommand } from "@aws-sdk/client-dynamodb";
+import { DynamoDBClient, UpdateItemCommand } from "@aws-sdk/client-dynamodb";
 import { cleanListName } from "../util/clean-list-name";
 
-export async function putListItems({
+export async function updateListItems({
   ddb,
   tableName,
   userId,
@@ -16,12 +16,19 @@ export async function putListItems({
 }) {
   const cleanedName = cleanListName(listName);
 
-  const cmd = new PutItemCommand({
+  const cmd = new UpdateItemCommand({
     TableName: tableName,
-    Item: {
+    Key: {
       PK: { S: userId },
       SK: { S: `LIST#${cleanedName}` },
       items: { SS: items },
+    },
+    UpdateExpression: "SET #its = :itms",
+    ExpressionAttributeNames: {
+      "#its": "items",
+    },
+    ExpressionAttributeValues: {
+      ":": { SS: items },
     },
     ConditionExpression: "attribute_exists(SK)",
   });

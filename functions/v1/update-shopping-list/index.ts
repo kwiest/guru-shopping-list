@@ -11,7 +11,7 @@ import type {
   APIGatewayProxyEventV2WithJWTAuthorizer,
   APIGatewayProxyResultV2,
 } from "aws-lambda";
-import { putListItems } from "./put-list-items";
+import { updateListItems } from "./update-list-items";
 
 const serviceName = "UpdateShoppingList";
 const logger = new Logger({ serviceName });
@@ -43,7 +43,7 @@ async function lambdaHandler(
   }
 
   try {
-    await putListItems({ ddb, tableName, userId, listName, items });
+    await updateListItems({ ddb, tableName, userId, listName, items });
 
     metrics.addMetric("shoppingListUpdated", MetricUnits.Count, 1);
 
