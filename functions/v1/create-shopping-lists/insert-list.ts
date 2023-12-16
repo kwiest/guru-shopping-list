@@ -1,5 +1,5 @@
 import { DynamoDBClient, PutItemCommand } from "@aws-sdk/client-dynamodb";
-import { cleanListName } from "./clean-list-name";
+import { cleanListName } from "../util/clean-list-name";
 
 export async function insertList({
   ddb,
