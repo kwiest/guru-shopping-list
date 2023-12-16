@@ -25,6 +25,8 @@ async function lambdaHandler(
   tracer.putAnnotation("userId", userId);
 
   const { listName } = event.pathParameters as { listName: string };
+  logger.appendKeys({ listName });
+  tracer.putAnnotation("listName", listName);
 
   try {
     const res = await getListByName({ ddb, tableName, userId, listName });
