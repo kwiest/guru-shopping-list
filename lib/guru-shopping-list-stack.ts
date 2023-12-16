@@ -72,7 +72,7 @@ export class GuruShoppingListStack extends cdk.Stack {
 
     const cognitoDomain = userPool.addDomain("SignInDomain", {
       cognitoDomain: {
-        domainPrefix: `guru-shopping-list.${props.environment}`,
+        domainPrefix: `guru-shopping-list-${props.environment}`,
       },
     });
     // Just use localhost to copy a JWT after sign-in
