@@ -142,5 +142,18 @@ export class GuruShoppingListStack extends cdk.Stack {
       methods: [HttpMethod.POST],
       authorizer: jwtAuthorizer,
     });
+
+    new cdk.CfnOutput(this, "UserPoolOidcConfig", {
+      exportName: "user-pool-oidc-config-url",
+      value: userPoolUrl + "/.well-known/openid-configuration",
+    });
+    new cdk.CfnOutput(this, "SignInUrl", {
+      exportName: "sign-in-url",
+      value: signInUrl,
+    });
+    new cdk.CfnOutput(this, "ApiExecuteUrl", {
+      exportName: "shopping-lists-api-url",
+      value: httpApi.defaultStage!.url,
+    });
   }
 }
