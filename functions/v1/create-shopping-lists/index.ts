@@ -48,6 +48,8 @@ async function lambdaHandler(
       createdAt: new Date(event.requestContext.timeEpoch),
     });
     metrics.addMetric("shoppingListCreated", MetricUnits.Count, 1);
+
+    return { statusCode: 201 };
   } catch (e) {
     logger.error("Error saving shopping list", e as Error);
 
@@ -58,8 +60,6 @@ async function lambdaHandler(
       }),
     };
   }
-
-  return { statusCode: 201 };
 }
 
 export const handler = middy(lambdaHandler)
