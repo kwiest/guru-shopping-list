@@ -19,8 +19,12 @@ import { RetentionDays } from "aws-cdk-lib/aws-logs";
 import { Construct } from "constructs";
 import * as path from "path";
 
+type GuruShoppingListStackProps = {
+  environment: "staging" | "production";
+} & cdk.StackProps;
+
 export class GuruShoppingListStack extends cdk.Stack {
-  constructor(scope: Construct, id: string, props?: cdk.StackProps) {
+  constructor(scope: Construct, id: string, props: GuruShoppingListStackProps) {
     super(scope, id, props);
 
     const userPool = new UserPool(this, "UserPool", {
@@ -67,7 +71,9 @@ export class GuruShoppingListStack extends cdk.Stack {
     });
 
     const cognitoDomain = userPool.addDomain("SignInDomain", {
-      cognitoDomain: { domainPrefix: "guru-shopping-list" },
+      cognitoDomain: {
+        domainPrefix: `guru-shopping-list.${props.environment}`,
+      },
     });
     // Just use localhost to copy a JWT after sign-in
     const signInUrl = cognitoDomain.signInUrl(cliClient, {

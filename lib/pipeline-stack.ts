@@ -29,10 +29,14 @@ export class PipelineStack extends Stack {
       }),
     });
 
-    const staging = new GuruShoppingListStage(this, "Staging");
+    const staging = new GuruShoppingListStage(this, "Staging", {
+      environment: "staging",
+    });
     pipeline.addStage(staging);
 
-    const production = new GuruShoppingListStage(this, "Production");
+    const production = new GuruShoppingListStage(this, "Production", {
+      environment: "production",
+    });
     pipeline.addStage(production);
   }
 }
