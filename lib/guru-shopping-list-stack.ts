@@ -177,6 +177,38 @@ export class GuruShoppingListStack extends cdk.Stack {
       authorizer: jwtAuthorizer,
     });
 
+    const updateListHandler = new NodejsFunction(
+      this,
+      "UpdateShoppingListHandler",
+      {
+        entry: path.join(
+          __dirname,
+          "..",
+          "functions",
+          "v1",
+          "update-shopping-list",
+          "index.ts"
+        ),
+        ...sharedLambdaConfig,
+      }
+    );
+    updateListHandler.role?.addToPrincipalPolicy(
+      new PolicyStatement({
+        effect: Effect.ALLOW,
+        actions: ["dynamodb:PutItem"],
+        resources: [ddbTable.tableArn],
+      })
+    );
+    httpApi.addRoutes({
+      integration: new HttpLambdaIntegration(
+        "UpdateShoppingListIntegration",
+        updateListHandler
+      ),
+      path: "/v1/shopping_lists/{listName}",
+      methods: [HttpMethod.PUT],
+      authorizer: jwtAuthorizer,
+    });
+
     new cdk.CfnOutput(this, "UserPoolOidcConfig", {
       exportName: `${props.environment}-user-pool-oidc-config-url`,
       value: userPoolUrl + "/.well-known/openid-configuration",
