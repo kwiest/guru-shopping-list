@@ -150,15 +150,15 @@ export class GuruShoppingListStack extends cdk.Stack {
     });
 
     new cdk.CfnOutput(this, "UserPoolOidcConfig", {
-      exportName: "user-pool-oidc-config-url",
+      exportName: `${props.environment}-user-pool-oidc-config-url`,
       value: userPoolUrl + "/.well-known/openid-configuration",
     });
     new cdk.CfnOutput(this, "SignInUrl", {
-      exportName: "sign-in-url",
+      exportName: `${props.environment}-sign-in-url`,
       value: signInUrl,
     });
     new cdk.CfnOutput(this, "ApiExecuteUrl", {
-      exportName: "shopping-lists-api-url",
+      exportName: `${props.environment}-shopping-lists-api-url`,
       value: httpApi.defaultStage!.url,
     });
   }
