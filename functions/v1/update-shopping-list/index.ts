@@ -43,7 +43,7 @@ async function lambdaHandler(
   }
 
   try {
-    const res = await putListItems({ ddb, tableName, userId, listName, items });
+    await putListItems({ ddb, tableName, userId, listName, items });
 
     metrics.addMetric("shoppingListUpdated", MetricUnits.Count, 1);
 
