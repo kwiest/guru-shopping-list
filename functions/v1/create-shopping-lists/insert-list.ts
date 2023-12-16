@@ -40,5 +40,5 @@ export async function insertList({
     ConditionExpression: "attribute_not_exists(SK)",
   });
 
-  await ddb.send(cmd);
+  return ddb.send(cmd);
 }
