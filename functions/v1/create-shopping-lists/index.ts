@@ -28,7 +28,7 @@ async function lambdaHandler(
   logger.appendKeys({ userId });
   tracer.putAnnotation("userId", userId);
 
-  const { list_name: listName } = JSON.parse(event.body!);
+  const { list_name: listName, items } = JSON.parse(event.body!);
   if (!listName) {
     logger.error("Client error: missing list name");
     return {
@@ -45,6 +45,7 @@ async function lambdaHandler(
       tableName,
       userId,
       listName,
+      items,
       createdAt: new Date(event.requestContext.timeEpoch),
     });
     metrics.addMetric("shoppingListCreated", MetricUnits.Count, 1);

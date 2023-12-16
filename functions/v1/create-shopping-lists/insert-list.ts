@@ -6,6 +6,7 @@ export async function insertList({
   tableName,
   userId,
   listName,
+  items,
   createdAt,
 }: {
   ddb: DynamoDBClient;
@@ -16,6 +17,9 @@ export async function insertList({
 
   // Unique Shopping List name
   listName: string;
+
+  // String set of items
+  items: string[];
 
   // Date when this list was created
   createdAt: Date;
@@ -29,6 +33,7 @@ export async function insertList({
       SK: { S: `LIST#${cleanedName}` },
       user_id: { S: userId },
       list_name: { S: listName },
+      items: { SS: items },
       type: { S: "shopping_list" },
       created_at: { N: createdAt.getTime().toString() },
     },
