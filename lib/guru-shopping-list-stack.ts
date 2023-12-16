@@ -103,6 +103,7 @@ export class GuruShoppingListStack extends cdk.Stack {
       tracing: Tracing.ACTIVE,
       environment: {
         TABLE_NAME: ddbTable.tableName,
+        POWERTOOLS_METRICS_NAMESPACE: "ShoppingLists",
       },
       bundling: {
         sourceMap: true,
