@@ -172,7 +172,7 @@ export class GuruShoppingListStack extends cdk.Stack {
         "GetShoppingListIntegration",
         getListHandler
       ),
-      path: "/v1/shopping_lists/${listName}",
+      path: "/v1/shopping_lists/{listName}",
       methods: [HttpMethod.GET],
       authorizer: jwtAuthorizer,
     });
