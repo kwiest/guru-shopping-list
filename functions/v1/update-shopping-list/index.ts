@@ -1,5 +1,9 @@
 import { Logger, injectLambdaContext } from "@aws-lambda-powertools/logger";
-import { Metrics, logMetrics } from "@aws-lambda-powertools/metrics";
+import {
+  MetricUnits,
+  Metrics,
+  logMetrics,
+} from "@aws-lambda-powertools/metrics";
 import { Tracer, captureLambdaHandler } from "@aws-lambda-powertools/tracer";
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import middy from "@middy/core";
@@ -40,6 +44,8 @@ async function lambdaHandler(
 
   try {
     const res = await putListItems({ ddb, tableName, userId, listName, items });
+
+    metrics.addMetric("shoppingListUpdated", MetricUnits.Count, 1);
 
     return {
       statusCode: 200,
