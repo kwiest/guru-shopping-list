@@ -28,7 +28,7 @@ export async function updateListItems({
       "#its": "items",
     },
     ExpressionAttributeValues: {
-      ":": { SS: items },
+      ":itms": { SS: items },
     },
     ConditionExpression: "attribute_exists(SK)",
   });
