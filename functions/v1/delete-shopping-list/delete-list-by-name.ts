@@ -17,6 +17,7 @@ export async function deleteListByName({
       PK: { S: userId },
       SK: { S: `LIST#${listName}` },
     },
+    ConditionExpression: "attribute_exists(SK)",
   });
 
   return ddb.send(cmd);
