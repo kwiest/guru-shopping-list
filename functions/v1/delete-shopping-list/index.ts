@@ -38,6 +38,9 @@ async function lambdaHandler(
 
     return {
       statusCode: 200,
+      body: JSON.stringify({
+        message: "Shopping list deleted.",
+      }),
     };
   } catch (e) {
     if ((e as Error).name === "ConditionalCheckFailedException") {
