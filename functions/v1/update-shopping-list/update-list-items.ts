@@ -29,6 +29,7 @@ export async function updateListItems({
     ExpressionAttributeValues: {
       ":itms": { SS: items },
     },
+    ReturnValues: "ALL_NEW",
     ConditionExpression: "attribute_exists(SK)",
   });
 
