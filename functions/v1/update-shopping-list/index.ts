@@ -51,6 +51,14 @@ async function lambdaHandler(
       statusCode: 200,
     };
   } catch (e) {
+    if ((e as Error).name === "ConditionalCheckFailedException") {
+      logger.error(
+        "Error deleting shopping list that cannot be found",
+        e as Error
+      );
+      return { statusCode: 404 };
+    }
+
     logger.error("Error updating shopping list", e as Error);
 
     return {
