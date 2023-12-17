@@ -27,6 +27,7 @@ export class GuruShoppingListStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props: GuruShoppingListStackProps) {
     super(scope, id, props);
 
+    // User management and authn/z
     const userPool = new UserPool(this, "UserPool", {
       selfSignUpEnabled: true,
       signInAliases: { email: true, phone: true },
@@ -58,7 +59,7 @@ export class GuruShoppingListStack extends cdk.Stack {
       scopes: [readScope, writeScope, deleteScope],
     });
 
-    // Access the API via curl or other CLI
+    // Access the API via curl or other HTTP client
     const cliClient = userPool.addClient("CliClient", {
       oAuth: {
         flows: { implicitCodeGrant: true },
@@ -80,14 +81,6 @@ export class GuruShoppingListStack extends cdk.Stack {
       redirectUri: "http://localhost",
     });
 
-    const ddbTable = new Table(this, "ShoppingListsTable", {
-      billingMode: BillingMode.PAY_PER_REQUEST,
-      partitionKey: { name: "PK", type: AttributeType.STRING },
-      sortKey: { name: "SK", type: AttributeType.STRING },
-    });
-
-    const httpApi = new HttpApi(this, "ShoppingListsApi");
-
     const jwtAuthorizer = new HttpJwtAuthorizer(
       "ShoppingListsAuthorizer",
       userPoolUrl,
@@ -96,6 +89,17 @@ export class GuruShoppingListStack extends cdk.Stack {
       }
     );
 
+    // Persistence
+    const ddbTable = new Table(this, "ShoppingListsTable", {
+      billingMode: BillingMode.PAY_PER_REQUEST,
+      partitionKey: { name: "PK", type: AttributeType.STRING },
+      sortKey: { name: "SK", type: AttributeType.STRING },
+    });
+
+    // API
+    const httpApi = new HttpApi(this, "ShoppingListsApi");
+
+    // Common configuration shared for all lambda functions
     const sharedLambdaConfig: Partial<NodejsFunctionProps> = {
       handler: "handler",
       runtime: Runtime.NODEJS_18_X,
@@ -242,6 +246,7 @@ export class GuruShoppingListStack extends cdk.Stack {
       authorizer: jwtAuthorizer,
     });
 
+    // Cloudformation outputs
     new cdk.CfnOutput(this, "UserPoolOidcConfig", {
       exportName: `${props.environment}-user-pool-oidc-config-url`,
       value: userPoolUrl + "/.well-known/openid-configuration",
