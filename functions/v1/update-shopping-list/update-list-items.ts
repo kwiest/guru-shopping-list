@@ -21,7 +21,6 @@ export async function updateListItems({
     Key: {
       PK: { S: userId },
       SK: { S: `LIST#${cleanedName}` },
-      items: { SS: items },
     },
     UpdateExpression: "SET #its = :itms",
     ExpressionAttributeNames: {
