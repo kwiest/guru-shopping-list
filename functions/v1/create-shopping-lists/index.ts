@@ -40,7 +40,7 @@ async function lambdaHandler(
   }
 
   try {
-    await insertList({
+    const res = await insertList({
       ddb,
       tableName,
       userId,
@@ -50,8 +50,25 @@ async function lambdaHandler(
     });
     metrics.addMetric("shoppingListCreated", MetricUnits.Count, 1);
 
-    return { statusCode: 201 };
+    return {
+      statusCode: 201,
+      body: JSON.stringify({
+        list_name: res.Attributes?.list_name.S,
+        items: res.Attributes?.items.SS || [],
+        created_at: res.Attributes?.created_at,
+      }),
+    };
   } catch (e) {
+    if ((e as Error).name === "ConditionalCheckFailedException") {
+      logger.error("Error creating duplicate list", e as Error);
+      return {
+        statusCode: 400,
+        body: JSON.stringify({
+          error: "Shopping list already exists",
+        }),
+      };
+    }
+
     logger.error("Error saving shopping list", e as Error);
 
     return {
