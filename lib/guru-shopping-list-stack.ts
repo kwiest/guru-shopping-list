@@ -210,6 +210,38 @@ export class GuruShoppingListStack extends cdk.Stack {
       authorizer: jwtAuthorizer,
     });
 
+    const deleteListHandler = new NodejsFunction(
+      this,
+      "DeleteShoppingListHandler",
+      {
+        entry: path.join(
+          __dirname,
+          "..",
+          "functions",
+          "v1",
+          "delete-shopping-list",
+          "index.ts"
+        ),
+        ...sharedLambdaConfig,
+      }
+    );
+    deleteListHandler.role?.addToPrincipalPolicy(
+      new PolicyStatement({
+        effect: Effect.ALLOW,
+        actions: ["dynamodb:DeleteItem"],
+        resources: [ddbTable.tableArn],
+      })
+    );
+    httpApi.addRoutes({
+      integration: new HttpLambdaIntegration(
+        "DeleteShoppingListIntegration",
+        deleteListHandler
+      ),
+      path: "/v1/shopping_lists/{listName}",
+      methods: [HttpMethod.DELETE],
+      authorizer: jwtAuthorizer,
+    });
+
     new cdk.CfnOutput(this, "UserPoolOidcConfig", {
       exportName: `${props.environment}-user-pool-oidc-config-url`,
       value: userPoolUrl + "/.well-known/openid-configuration",
