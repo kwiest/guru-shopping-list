@@ -43,12 +43,22 @@ async function lambdaHandler(
   }
 
   try {
-    await updateListItems({ ddb, tableName, userId, listName, items });
+    const res = await updateListItems({
+      ddb,
+      tableName,
+      userId,
+      listName,
+      items,
+    });
 
     metrics.addMetric("shoppingListUpdated", MetricUnits.Count, 1);
 
     return {
       statusCode: 200,
+      body: JSON.stringify({
+        list_name: res.Attributes?.list_name.S,
+        items: res.Attributes?.items.SS || [],
+      }),
     };
   } catch (e) {
     if ((e as Error).name === "ConditionalCheckFailedException") {
