@@ -196,7 +196,7 @@ export class GuruShoppingListStack extends cdk.Stack {
     updateListHandler.role?.addToPrincipalPolicy(
       new PolicyStatement({
         effect: Effect.ALLOW,
-        actions: ["dynamodb:PutItem"],
+        actions: ["dynamodb:UpdateItem"],
         resources: [ddbTable.tableArn],
       })
     );
