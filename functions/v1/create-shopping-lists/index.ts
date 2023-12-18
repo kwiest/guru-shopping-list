@@ -53,9 +53,7 @@ async function lambdaHandler(
     return {
       statusCode: 201,
       body: JSON.stringify({
-        list_name: res.Attributes?.list_name.S,
-        items: res.Attributes?.items.SS || [],
-        created_at: res.Attributes?.created_at,
+        message: "New shopping list created!",
       }),
     };
   } catch (e) {
