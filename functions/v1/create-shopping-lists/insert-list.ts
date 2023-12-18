@@ -37,7 +37,6 @@ export async function insertList({
       type: { S: "shopping_list" },
       created_at: { N: createdAt.getTime().toString() },
     },
-    ReturnValues: "ALL_NEW",
     ConditionExpression: "attribute_not_exists(SK)",
   });
 
